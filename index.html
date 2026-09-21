@@ -12,7 +12,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" crossorigin="" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -62,19 +61,6 @@
     .field::placeholder { color: #94a3b8; }
     input.field:invalid:not(:placeholder-shown):not(:focus) { border-color: #e11d48; }
     select.field { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230a3d2e' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1rem; padding-right: 2.6rem; }
-    /* leaflet + tailwind preflight fixes */
-    .leaflet-container img, .leaflet-tile { max-width: none !important; }
-    .leaflet-container { font-family: inherit; background: #eaf3ee; }
-    .pr-pin span { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 9999px; background: #157a24; color: #fff; font-weight: 800; font-size: 14px; border: 3px solid #fff; box-shadow: 0 6px 16px rgba(6, 40, 20, .4); transition: transform .2s; }
-    .pr-pin:hover span { transform: scale(1.15); }
-    .leaflet-popup-content-wrapper { border-radius: 1rem; padding: 0; overflow: hidden; }
-    .leaflet-popup-content { margin: 0; width: auto !important; }
-    .pr-pop { display: flex; gap: .75rem; align-items: center; padding: .6rem; }
-    .pr-pop img { width: 64px; height: 64px; border-radius: .75rem; object-fit: cover; }
-    .pr-pop strong { display: block; color: #0a3d2e; font-size: 14px; line-height: 1.2; }
-    .pr-pop span { display: block; color: #64748b; font-size: 12px; margin-top: 2px; }
-    .pr-pop b { display: block; color: #0a3d2e; font-size: 13px; margin-top: 4px; }
-    .pr-pop a { display: inline-block; margin-top: 4px; color: #157a24; font-weight: 700; font-size: 12px; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { scrollbar-width: none; }
     @media (prefers-reduced-motion: reduce) {
@@ -423,25 +409,56 @@
       </div>
     </section>
 
-    <!-- ============ EXPEDITIONS MAP ============ -->
-    <section id="expeditions" class="bg-brand-50/90">
-      <div class="mx-auto max-w-[2000px] px-5 py-16 sm:px-8 lg:px-14 lg:py-20 xl:px-20 2xl:px-28">
+    <!-- ============ EXPEDITIONS GLOBE ============ -->
+    <section id="expeditions" class="relative overflow-hidden bg-[#020c08] text-white">
+      <div class="pointer-events-none absolute -left-40 top-10 h-[28rem] w-[28rem] rounded-full bg-brand-500/20 blur-[120px]"></div>
+      <div class="pointer-events-none absolute -right-40 bottom-20 h-[28rem] w-[28rem] rounded-full bg-amber-400/10 blur-[120px]"></div>
+
+      <div class="relative mx-auto max-w-[2000px] px-5 py-16 sm:px-8 lg:px-14 lg:py-20 xl:px-20 2xl:px-28">
         <div class="reveal grid items-end gap-6 lg:grid-cols-[1.2fr_1fr]">
           <div>
-            <p class="text-xs font-bold uppercase tracking-[.12em] text-brand-700">Upcoming Expeditions</p>
-            <h2 class="mt-3 text-4xl font-extrabold leading-[1.1] tracking-tight text-ink sm:text-[42px]">
-              Upcoming Expeditions<br /><span class="text-brand-600">Global Map</span>
+            <p class="text-xs font-bold uppercase tracking-[.12em] text-brand-200">Upcoming Expeditions</p>
+            <h2 class="mt-3 text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-[42px]">
+              Upcoming Expeditions<br /><span class="text-brand-500">Global Map</span>
             </h2>
-            <svg class="mt-2 h-3 w-24 text-brand-600" viewBox="0 0 96 12" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" aria-hidden="true"><path d="M3 8c14-5 34-6 52-5 14 .6 28 1.4 38 1"/></svg>
+            <svg class="mt-2 h-3 w-24 text-brand-500" viewBox="0 0 96 12" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" aria-hidden="true"><path d="M3 8c14-5 34-6 52-5 14 .6 28 1.4 38 1"/></svg>
           </div>
-          <p class="max-w-md text-[15px] leading-relaxed text-slate-600 lg:justify-self-end">Track where the next PackRoam expeditions are heading across India and beyond.</p>
+          <p class="max-w-md text-[15px] leading-relaxed text-white/65 lg:justify-self-end">Track where the next PackRoam expeditions are heading across India and beyond.</p>
         </div>
 
-        <div class="reveal mt-10 grid gap-5 lg:grid-cols-[1fr_400px] xl:grid-cols-[1fr_440px]">
-          <div class="relative isolate overflow-hidden rounded-[2rem] bg-white shadow-soft ring-1 ring-brand-100">
-            <div id="map" class="h-[380px] w-full sm:h-[460px] lg:h-full lg:min-h-[560px]" role="application" aria-label="Map of upcoming PackRoam expeditions"></div>
+        <div class="reveal relative mt-6">
+          <div class="relative">
+          <div id="globeWrap" class="relative h-[420px] sm:h-[560px] lg:h-[680px]">
+            <div id="globe" class="absolute inset-0 cursor-grab touch-pan-y active:cursor-grabbing [mask-image:radial-gradient(ellipse_closest-side,#000_78%,transparent_100%)] [-webkit-mask-image:radial-gradient(ellipse_closest-side,#000_78%,transparent_100%)]" role="img" aria-label="Interactive 3D globe showing upcoming PackRoam expeditions. Use the destination buttons below as a keyboard-friendly alternative."></div>
+            <div id="globeLoading" class="pointer-events-none absolute inset-0 grid place-items-center text-sm font-medium text-white/60">
+              <span class="flex items-center gap-3"><span class="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-amber-300"></span>Loading globe…</span>
+            </div>
+
+            <div id="globeFallback" class="absolute inset-0 hidden place-items-center px-6 text-center text-sm text-white/60">The 3D globe needs WebGL, which isn&rsquo;t available here. Pick a destination below to explore it.</div>
           </div>
-          <ol id="expList" class="space-y-2.5"></ol>
+            <!-- selected destination card -->
+            <div id="globeCard" class="relative z-10 mt-3 hidden rounded-3xl border border-white/15 bg-[#06170f]/80 p-3 shadow-2xl backdrop-blur-xl sm:absolute sm:bottom-6 sm:right-4 sm:mt-0 sm:w-[340px] lg:right-8" role="dialog" aria-live="polite">
+              <button id="gcClose" type="button" class="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-white/10 text-white/80 transition hover:bg-white/20" aria-label="Close destination card"><svg class="h-3.5 w-3.5"><use href="#i-close"/></svg></button>
+              <div class="flex items-center gap-3 pr-9">
+                <img id="gcImg" src="" alt="" class="h-[72px] w-[72px] shrink-0 rounded-2xl object-cover" />
+                <div class="min-w-0">
+                  <p id="gcMeta" class="text-[11px] font-bold uppercase tracking-[.1em] text-amber-300"></p>
+                  <h3 id="gcTitle" class="mt-0.5 text-base font-bold leading-snug"></h3>
+                  <p id="gcPrice" class="mt-1 text-sm text-white/70"></p>
+                </div>
+              </div>
+              <div class="mt-3 grid grid-cols-2 gap-2">
+                <button id="gcDetails" type="button" class="rounded-full border border-white/20 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10">View details</button>
+                <button id="gcEnquire" type="button" class="rounded-full bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-500">Enquire</button>
+              </div>
+            </div>
+
+          </div>
+
+          <p class="mt-2 text-center text-[11px] font-semibold uppercase tracking-[.22em] text-white/70 sm:text-xs">
+            <span class="text-amber-300">✦</span> Drag to rotate <span class="mx-2 text-white/30">·</span> Scroll to zoom <span class="mx-2 text-white/30">·</span> Click a pin to explore
+          </p>
+          <div id="expChips" class="mx-auto mt-6 flex max-w-5xl flex-wrap justify-center gap-2.5"></div>
         </div>
       </div>
     </section>
@@ -776,7 +793,7 @@
 
     document.getElementById('yr').textContent = new Date().getFullYear();
   </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/globe.gl@2.33.1/dist/globe.gl.min.js"></script>
   <script>
     // ---------- CONFIG: wire these up when going live ----------
     const CONFIG = {
@@ -895,7 +912,7 @@
     }
     document.addEventListener('click', (e) => {
       const a = e.target.closest('[data-enquire]');
-      if (a) { prefill(a.dataset.enquire, a.dataset.type); const p = e.target.closest('.leaflet-popup'); if (p) { e.preventDefault(); $('enquiry').scrollIntoView({ behavior: 'smooth' }); } }
+      if (a) { prefill(a.dataset.enquire, a.dataset.type); }
     });
     const trav = $('fTravelers');
     const step = (n) => { trav.value = Math.min(30, Math.max(1, (parseInt(trav.value, 10) || 1) + n)); };
@@ -950,48 +967,116 @@
       }
     });
 
-    // ---------- expeditions map ----------
-    const list = $('expList');
-    list.innerHTML = DESTS.map((d, i) => `
-      <li><button type="button" data-i="${i}" class="group flex w-full items-center gap-4 rounded-2xl bg-white p-3 text-left ring-1 ring-brand-100 transition hover:-translate-y-0.5 hover:shadow-soft">
-        <span class="relative shrink-0"><img src="${photo(d)}" alt="" loading="lazy" class="h-14 w-14 rounded-xl object-cover" />
-          <span class="absolute -left-1.5 -top-1.5 grid h-6 w-6 place-items-center rounded-full bg-brand-600 text-[11px] font-bold text-white ring-2 ring-white">${i + 1}</span></span>
-        <span class="min-w-0 flex-1"><span class="block truncate text-[15px] font-bold text-ink">${d.title}</span><span class="block text-xs text-slate-500">${d.region} · ${d.days} Days</span></span>
-        <span class="text-right"><span class="block text-sm font-extrabold text-ink">${inr(d.price)}</span><span class="block text-[10px] font-semibold uppercase tracking-wide text-slate-400">onwards</span></span>
-      </button></li>`).join('') +
-      `<li><button type="button" id="mapAll" class="w-full rounded-2xl border border-dashed border-brand-200 px-4 py-3 text-sm font-semibold text-brand-700 transition hover:bg-white">Show all destinations</button></li>`;
+    // ---------- expeditions: interactive 3D globe ----------
+    (function initGlobe() {
+      const TEX = 'https://cdn.jsdelivr.net/npm/three-globe@2/example/img/';
+      const el = $('globe'), chips = $('expChips'), card = $('globeCard');
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let globe = null, active = -1, resumeTimer;
 
-    if (window.L) {
-      const map = L.map('map', { scrollWheelZoom: false, worldCopyJump: true, dragging: !L.Browser.mobile, tap: false });
-      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
-        maxZoom: 16
-      }).addTo(map);
-      const bounds = L.latLngBounds(DESTS.map(d => [d.lat, d.lng]));
-      const fitAll = () => map.fitBounds(bounds, { padding: [50, 50], maxZoom: 5 });
-      const markers = DESTS.map((d, i) => {
-        const m = L.marker([d.lat, d.lng], {
-          title: d.title,
-          icon: L.divIcon({ className: 'pr-pin', html: `<span>${i + 1}</span>`, iconSize: [38, 38], iconAnchor: [19, 19], popupAnchor: [0, -20] })
-        }).addTo(map);
-        m.bindPopup(`<div class="pr-pop"><img src="${photo(d)}" alt="" /><div><strong>${d.title}</strong><span>${d.region} · ${d.days} Days</span><b>${inr(d.price)} onwards</b><a href="#enquiry" data-enquire="${d.id}">Enquire →</a></div></div>`, { maxWidth: 300, closeButton: false });
-        m.on('click', () => setActive(i));
-        return m;
-      });
-      const btns = [...list.querySelectorAll('button[data-i]')];
-      function setActive(i) { btns.forEach((b, k) => b.classList.toggle('!ring-2', k === i)); btns.forEach((b, k) => b.classList.toggle('!ring-brand-600', k === i)); }
-      btns.forEach((b) => b.addEventListener('click', () => {
-        const i = +b.dataset.i; setActive(i);
-        map.flyTo([DESTS[i].lat, DESTS[i].lng], 6, { duration: 1.1 });
-        setTimeout(() => markers[i].openPopup(), 1000);
-        if (window.matchMedia('(max-width:1023px)').matches) $('map').scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }));
-      $('mapAll').addEventListener('click', () => { map.closePopup(); setActive(-1); fitAll(); });
-      fitAll();
-      new ResizeObserver(() => map.invalidateSize()).observe($('map'));
-    } else {
-      $('map').innerHTML = '<div class="grid h-full place-items-center p-8 text-center text-sm text-slate-500">Map unavailable offline. Browse the destinations on the right.</div>';
-    }
+      chips.innerHTML = DESTS.map((d, i) => `
+        <button type="button" data-i="${i}" class="group inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[.04] px-4 py-2.5 text-sm font-semibold text-white/90 transition hover:border-amber-300/60 hover:bg-white/10">
+          <span class="h-2 w-2 rounded-full bg-amber-300 shadow-[0_0_10px_2px_rgba(251,191,36,.7)]"></span>
+          ${d.title}
+          <span class="text-xs font-normal italic text-white/50">${d.days} Days</span>
+        </button>`).join('');
+      const chipEls = [...chips.querySelectorAll('button')];
+
+      function paint() {
+        chipEls.forEach((b, k) => {
+          const on = k === active;
+          b.classList.toggle('!border-amber-300', on);
+          b.classList.toggle('!bg-amber-300/15', on);
+          b.classList.toggle('shadow-[0_0_24px_-4px_rgba(251,191,36,.6)]', on);
+        });
+      }
+      function showCard(i) {
+        const d = DESTS[i];
+        $('gcImg').src = photo(d); $('gcImg').alt = d.title;
+        $('gcMeta').textContent = `${d.region} · ${d.days} Days`;
+        $('gcTitle').textContent = d.title;
+        $('gcPrice').textContent = `From ${inr(d.price)} onwards`;
+        card.classList.remove('hidden');
+      }
+      function select(i, fly = true) {
+        active = i; paint(); showCard(i);
+        if (globe && fly) {
+          globe.controls().autoRotate = false;
+          globe.pointOfView({ lat: DESTS[i].lat, lng: DESTS[i].lng, altitude: 1.35 }, 1200);
+          scheduleResume(7000);
+        }
+      }
+      function scheduleResume(ms) {
+        clearTimeout(resumeTimer);
+        resumeTimer = setTimeout(() => { if (globe && !reduceMotion) globe.controls().autoRotate = true; }, ms);
+      }
+
+      chips.addEventListener('click', (e) => { const b = e.target.closest('button[data-i]'); if (b) select(+b.dataset.i); });
+      $('gcClose').addEventListener('click', () => { card.classList.add('hidden'); active = -1; paint(); if (globe) { globe.pointOfView({ altitude: 1.8 }, 900); scheduleResume(1000); } });
+      $('gcDetails').addEventListener('click', () => openModal(DESTS[active].id));
+      $('gcEnquire').addEventListener('click', () => { prefill(DESTS[active].id); $('enquiry').scrollIntoView({ behavior: 'smooth' }); });
+
+      function fail() { $('globeLoading').remove(); const f = $('globeFallback'); f.classList.remove('hidden'); f.classList.add('grid'); }
+
+      function boot() {
+        if (globe) return;
+        if (!window.Globe) return fail();
+        try {
+          globe = Globe({ animateIn: true })(el)
+            .backgroundColor('rgba(0,0,0,0)')
+            .backgroundImageUrl(TEX + 'night-sky.png')
+            .globeImageUrl(TEX + 'earth-blue-marble.jpg')
+            .bumpImageUrl(TEX + 'earth-topology.png')
+            .showAtmosphere(true).atmosphereColor('#f5b301').atmosphereAltitude(0.2)
+            // pins
+            .pointsData(DESTS).pointLat('lat').pointLng('lng')
+            .pointColor(() => '#fde68a').pointAltitude(0.014).pointRadius(0.6).pointResolution(16)
+            .pointLabel((d) => `<div style="font:600 12px Plus Jakarta Sans,sans-serif;padding:6px 10px;border-radius:10px;background:rgba(6,23,15,.9);color:#fff;border:1px solid rgba(255,255,255,.15)">${d.title}<br><span style="font-weight:400;color:#fbbf24">${d.days} Days · ${inr(d.price)}</span></div>`)
+            .onPointClick((d) => select(DESTS.indexOf(d)))
+            .onPointHover((d) => { el.style.cursor = d ? 'pointer' : ''; })
+            // pulsing rings
+            .ringsData(DESTS).ringLat('lat').ringLng('lng')
+            .ringColor(() => (t) => `rgba(251,191,36,${1 - t})`)
+            .ringMaxRadius(3.4).ringPropagationSpeed(1.4).ringRepeatPeriod(1700)
+            // labels
+            .labelsData(DESTS).labelLat('lat').labelLng('lng')
+            .labelText((d) => d.title.split(' ')[0])
+            .labelSize(1.5).labelDotRadius(0.001).labelColor(() => '#ffffff')
+            .labelResolution(3).labelAltitude(0.02)
+            .onLabelClick((d) => select(DESTS.indexOf(d)));
+
+          globe.renderer().setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+          globe.pointOfView({ lat: 20, lng: 80, altitude: 1.8 });
+
+          const c = globe.controls();
+          c.autoRotate = !reduceMotion; c.autoRotateSpeed = 0.5;
+          c.enablePan = false; c.enableZoom = false; c.enableDamping = true;
+          c.addEventListener('start', () => { c.autoRotate = false; clearTimeout(resumeTimer); });
+          c.addEventListener('end', () => scheduleResume(4000));
+
+          // wheel zoom while hovering; hands scrolling back to the page at the zoom limits
+          el.addEventListener('wheel', (e) => {
+            const alt = globe.pointOfView().altitude, MIN = 0.55, MAX = 3.4;
+            const out = e.deltaY > 0;
+            if ((out && alt >= MAX - 0.01) || (!out && alt <= MIN + 0.01)) return;
+            e.preventDefault();
+            globe.pointOfView({ altitude: Math.min(MAX, Math.max(MIN, alt * (out ? 1.1 : 0.9))) }, 0);
+            c.autoRotate = false; scheduleResume(4000);
+          }, { passive: false });
+
+          const fit = () => { globe.width(el.clientWidth).height(el.clientHeight); };
+          fit(); new ResizeObserver(fit).observe(el);
+          setTimeout(() => { const l = $('globeLoading'); if (l) l.remove(); }, 1600);
+        } catch (err) {
+          console.warn('[PackRoam] Globe failed to start', err);
+          globe = null; fail();
+        }
+      }
+
+      new IntersectionObserver((entries, o) => {
+        if (entries[0].isIntersecting) { boot(); o.disconnect(); }
+      }, { rootMargin: '400px' }).observe(el);
+    })();
 
     // ---------- scroll spy for the header nav ----------
     const navLinks = [...document.querySelectorAll('[data-nav]')];
